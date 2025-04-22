@@ -1,28 +1,17 @@
 #!/bin/bash
 # Update and install dependencies
-sudo yum update -y
-sudo yum install -y python3 python3-pip
+yum update -y
+yum install -y git python3 python3-pip
 
 # Create a directory for the bot
-mkdir -p /home/ubuntu/discord-bot
+cd /home/ec2-user
 
-# Write bot code
-cat <<EOF > /home/ubuntu/discord-bot/bot.py
-${python_script}
-EOF
-
-# Create the .env file
-cat <<EOF > /home/ubuntu/discord-bot/.env
-${env_file}
-EOF
-
-# Write requirements.txt
-cat <<EOF > /home/ubuntu/discord-bot/requirements.txt
-${requirements}
-EOF
+# Clone GitHub repo
+git clone https://github.com/csci-4452-spring25/team-3.git
+cd team-3
 
 # Install Python dependencies
-sudo pip3 install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Run the Python script
-python3 /home/ubuntu/discord-bot/bot.py
+python3 team-3/infrastructure/Code/bot.py

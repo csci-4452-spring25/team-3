@@ -10,15 +10,12 @@ resource "aws_instance" "discord_bot" {
 
     security_groups = [aws_security_group.sg_ssh.name]
 
-    user_data = templatefile("user_data.sh.tpl", {
-        python_script = file("${path.module}/Code/bot.py"),
-        requirements  = file("${path.module}/Code/requirements.txt"),
-        env_file      = file("${path.module}/Code/.env")
-    })
+    user_data = file("${path.module}/user_data.sh.tpl")
 
     tags = {
         Name = var.instance_name
     }
+
 }
 
 resource "aws_security_group" "sg_ssh" {
@@ -41,6 +38,6 @@ resource "aws_security_group" "sg_ssh" {
 }
 
 resource "aws_key_pair" "generated_key" {
-  key_name = "generated-key"
-  public_key = file(var.public_key_path)
+    key_name = "generated-key"
+    public_key = file(var.public_key_path)
 }
