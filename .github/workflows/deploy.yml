@@ -20,7 +20,7 @@ jobs:
 
     - name: Deploy to EC2 and Restart Bot
       run: |
-        ssh -i ~/.ssh/aws_key.pem ec2-user@${{ secrets.INSTANCE_IP }} << EOF
+        ssh -i /home/runner/.ssh/aws_key.pem ec2-user@${{ secrets.INSTANCE_IP }} << EOF
 
           # bot directory
           cd /home/ec2-user/team-3
