@@ -1,0 +1,48 @@
+name: Deploy Bot to EC2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up SSH
+      run: |
+        echo "setting up SSH"
+        mkdir -p $HOME/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > $HOME/.ssh/aws_key.pem
+        chmod 600 $HOME/.ssh/aws_key.pem
+        # erroring here
+        ssh-keyscan ${{ secrets.INSTANCE_IP }} >> $HOME/.ssh/known_hosts || echo "failed to scan SSH key"
+        
+        echo "SSH setup complete"
+
+    - name: Deploy to EC2 and Restart Bot
+      env: 
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        HOSTNAME: ${{ secrets.INSTANCE_IP }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@${HOSTNAME} << EOF
+
+          git config --global --add safe.directory /home/ec2-user/team-3
+          
+          # bot directory
+          cd /home/ec2-user/team-3 || exit 1
+
+          # pull latest code
+          sudo git pull origin main || exit 1
+
+          # install dependencies if needed
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+          # restart bot
+          pkill -f bot.py || true
+          nohup python3 infrastructure/Code/bot.py > /home/ec2-user/team-3/bot.log 2>&1 &
+        EOF
