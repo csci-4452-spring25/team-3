@@ -14,4 +14,4 @@ cd team-3
 pip3 install -r requirements.txt
 
 # Run the Python script
-python3 team-3/infrastructure/Code/bot.py
+nohup python3 infrastructure/Code/bot.py &
