@@ -40,8 +40,8 @@ jobs:
           sudo git pull origin main || exit 1
 
           # install dependencies if needed
-          source venv/bin/activate
-          pip install -r requirements.txt
+          # source venv/bin/activate
+          # pip install -r requirements.txt
 
           # restart bot
           pkill -f bot.py || true
