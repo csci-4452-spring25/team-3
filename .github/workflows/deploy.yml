@@ -10,33 +10,28 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Debugging - Check User and Permissions
-      run: |
-        echo "Current user:"
-        whoami
-        echo "Current working directory:"
-        pwd
-        echo "Permissions for /home/runner"
-        ls -al $HOME
-        echo "Checking available directories:"
-        ls -al $HOME/.ssh || echo ".ssh directory does not exist"
     
     - name: Set up SSH
       run: |
         echo "setting up SSH"
-        mkdir -p $HOME/.ssh || echo ".ssh directory creation failed"
-        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > $HOME/.ssh/aws_key.pem || echo "failed to write SSH private key"
-        chmod 600 $HOME/.ssh/aws_key.pem || echo "failed to set perms on private key"
+        mkdir -p $HOME/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > $HOME/.ssh/aws_key.pem
+        chmod 600 $HOME/.ssh/aws_key.pem
+        # erroring here
         ssh-keyscan ${{ secrets.INSTANCE_IP }} >> $HOME/.ssh/known_hosts || echo "failed to scan SSH key"
+        
         echo "SSH setup complete"
 
     - name: Deploy to EC2 and Restart Bot
+      env: 
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        HOSTNAME: ${{ secrets.INSTANCE_IP }}
       run: |
-        ssh -i $HOME/.ssh/aws_key.pem ec2-user@${{ secrets.INSTANCE_IP }} << EOF
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@${HOSTNAME} << EOF
 
           # bot directory
-          cd /home/ec2-user/team-3
+          cd /home/ec2-user/team-3 || exit 1
 
           # pull latest code
           git pull origin main || exit 1
