@@ -42,14 +42,14 @@ jobs:
           git reset --hard HEAD
           sudo git pull origin main || exit 1
 
-          # testing gnna choose guild id since it doesnt really matter
-          echo "GUILD_ID: $GUILD_ID"
-
           # install dependencies if needed
           # source venv/bin/activate
           # pip install -r requirements.txt
 
           # restart bot
           pkill -f bot.py || true
-          nohup DISCORD_TOKEN=$DISCORD_TOKEN STEAM_API_KEY=$STEAM_API_KEY GUILD_ID=$GUILD_ID python3 infrastructure/Code/bot.py > /home/ec2-user/team-3/bot.log 2>&1 &
+          export DISCORD_TOKEN=$DISCORD_TOKEN 
+          export STEAM_API_KEY=$STEAM_API_KEY 
+          export GUILD_ID=$GUILD_ID
+          nohup python3 infrastructure/Code/bot.py > /home/ec2-user/team-3/bot.log 2>&1 &
         EOF
