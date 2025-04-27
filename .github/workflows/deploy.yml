@@ -11,6 +11,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Debugging - Check directory and create it
+      run: |
+        echo "Checking if .ssh directory exists"
+        ls -al /home/runner
+        mkdir -p /home/runner/.ssh || echo "Failed to create /home/runner/.ssh"
+        
     - name: Set up SSH
       run: |
         mkdir -p /home/runner/.ssh
