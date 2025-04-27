@@ -36,6 +36,7 @@ jobs:
           cd /home/ec2-user/team-3 || exit 1
 
           # pull latest code
+          git reset --hard HEAD
           sudo git pull origin main || exit 1
 
           # install dependencies if needed
