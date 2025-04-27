@@ -11,12 +11,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Debugging - Check directory and create it
+    - name: Debugging - Check User and Permissions
       run: |
-        echo "Checking if .ssh directory exists"
+        echo "Current user:"
+        whoami
+        echo "Current working directory:"
+        pwd
+        echo "Permissions for /home/runner"
         ls -al $HOME
-        mkdir -p $HOME/.ssh || echo "Failed to create /home/runner/.ssh"
-        
+        echo "Checking available directories:"
+        ls -al $HOME/.ssh || echo ".ssh directory does not exist"
+    
     - name: Set up SSH
       run: |
         echo "setting up SSH"
