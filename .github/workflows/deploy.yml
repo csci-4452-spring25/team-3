@@ -1,0 +1,28 @@
+name: Deploy Bot to EC2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
+        chmod 600 ~/.ssh/aws_key.pem
+        ssh-keyscan ${{ secrets.INSTANCE_IP }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to EC2 and Restart Bot
+      run: |
+        ssh -i ~/.ssh/aws_key.pem ec2-user@${{ secrets.INSTANCE_IP }} << EOF
+          cd /home/ubuntu/discord-bot
+          git pull origin main || exit 1
+          pkill -f bot.py || true
+          nohup python3 bot.py > /home/ubuntu/discord-bot/bot.log 2>&1 &
+        EOF
