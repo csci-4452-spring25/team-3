@@ -1,7 +1,9 @@
 name: Deploy Bot to EC2
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -53,3 +55,11 @@ jobs:
           export GUILD_ID=$GUILD_ID
           nohup python3 infrastructure/Code/bot.py > /home/ec2-user/team-3/bot.log 2>&1 &
         EOF
+
+    - name: Send Discord notification on deploy
+      run: |
+        curl -H "Content-Type: application/json" \
+        -X POST \
+        -d "{\"content\": \"😼 deployment success. bot is live.\"}" \
+        ${{ secrets.DISCORD_WEBHOOK_URL }}
+
