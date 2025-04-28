@@ -12,7 +12,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: print workign directory
-        run: pwd
+        run: |
+          pwd
+          ls
 
       - name: Set Up Python
         uses: actions/setup-python@v4
