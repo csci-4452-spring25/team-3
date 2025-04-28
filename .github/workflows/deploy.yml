@@ -61,5 +61,5 @@ jobs:
         curl -H "Content-Type: application/json" \
         -X POST \
         -d "{\"content\": \"😼 deployment success. bot is live.\"}" \
-        ${{ secrets.DISCORD_WEBHOOK_URL }}
+        ${{ secrets.DISCORD_WEBHOOK }}
 
