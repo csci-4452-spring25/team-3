@@ -132,14 +132,49 @@ async def steamgame(interaction: discord.Interaction, game_name: str):
     if not games:
         await interaction.followup.send("No results found.")
         return
-
+    
+    # if only one game, skip dropdown
     if len(games) == 1:
-        await GameSelectView(games).children[0].callback(interaction)
-    else:
-        await interaction.followup.send(
-            content="Choose...",
-            view=GameSelectView(games)
+        selected_game = games[0]
+        appid = selected_game["id"]
+        detail_resp = requests.get(f"https://store.steampowered.com/api/appdetails?appids={appid}", timeout=10).json()
+        detail_data = detail_resp[str(appid)]["data"]
+
+        description = html.unescape(detail_data.get("short_description", "No description available."))
+        header_image = detail_data.get("header_image", None)
+        name = selected_game["name"]
+        link = selected_game.get("url", f"https://store.steampowered.com/app/{selected_game['id']}")
+
+        release_info = detail_data.get("release_date", {})
+        release_date = release_info.get("date", "Unknown")
+
+        if selected_game.get("price"):
+            final_price = selected_game["price"].get("final", 0)
+            currency = selected_game["price"].get("currency", "USD")
+            price = f"{currency} ${final_price / 100:.2f}"
+        else:
+            price = "Free"
+
+        embed = discord.Embed(
+            title=name,
+            url=link,
+            description=description,
+            color=discord.Color.blue()
         )
+        embed.add_field(name="Price", value=price, inline=True)
+        embed.add_field(name="Release Date", value=release_date, inline=True)
+
+        if header_image:
+            embed.set_image(url=header_image)
+
+        embed.set_footer(text="Powered by Steam")
+
+        await interaction.followup.send(embed=embed)
+
+    await interaction.followup.send(
+        content="Choose a game...",
+        view=GameSelectView(games)
+    )
 
 # slash command to get a random game
 @app_commands.command(name="randomgame", description="Pick a random game from your unplayed games")
