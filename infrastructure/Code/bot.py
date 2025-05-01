@@ -133,10 +133,13 @@ async def steamgame(interaction: discord.Interaction, game_name: str):
         await interaction.followup.send("No results found.")
         return
 
-    await interaction.followup.send(
-        content="Choose the correct game from the dropdown:",
-        view=GameSelectView(games)
-    )
+    if len(games) == 1:
+        await GameSelectView(games).children[0].callback(interaction)
+    else:
+        await interaction.followup.send(
+            content="Choose...",
+            view=GameSelectView(games)
+        )
 
 # slash command to get a random game
 @app_commands.command(name="randomgame", description="Pick a random game from your unplayed games")
