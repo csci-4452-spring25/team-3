@@ -207,7 +207,7 @@ async def randomgame(interaction: discord.Interaction):
         )
         embed.set_thumbnail(url=detail_data.get("header_image", ""))
         embed.add_field(
-            name="Genres",
+            name="GenresReeee",
             value=", ".join([g["description"] for g in detail_data.get("genres", [])]) or "N/A",
             inline=True
         )
