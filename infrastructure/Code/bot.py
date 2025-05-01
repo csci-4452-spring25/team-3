@@ -197,7 +197,7 @@ async def randomgame(interaction: discord.Interaction):
         detail_url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=us&l=en"
         detail_resp = requests.get(detail_url, timeout=10).json()
         detail_data = detail_resp[str(appid)]["data"]
-        description = html.unescape(detail_data.get("short_description", "No description available.")),
+        description = html.unescape(detail_data.get("short_description", "No description available."))
 
         embed = discord.Embed(
             title=detail_data["name"],
