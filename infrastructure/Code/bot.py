@@ -122,7 +122,7 @@ class GameSelect(Select):
 @app_commands.command(name="steamgame", description="Look up a Steam game")
 @app_commands.describe(game_name="Name of game")
 async def steamgame(interaction: discord.Interaction, game_name: str):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer()
 
     # search Steam store
     search_url = f"https://store.steampowered.com/api/storesearch/?term={game_name}&cc=us&l=en"
@@ -164,7 +164,7 @@ async def randomgame(interaction: discord.Interaction):
         embed = discord.Embed(
             title=detail_data["name"],
             url=f"https://store.steampowered.com/app/{appid}/",
-            description=description
+            description=description,
             color=0x470109
         )
         embed.set_thumbnail(url=detail_data.get("header_image", ""))
