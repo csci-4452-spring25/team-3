@@ -170,11 +170,11 @@ async def steamgame(interaction: discord.Interaction, game_name: str):
         embed.set_footer(text="Powered by Steam")
 
         await interaction.followup.send(embed=embed)
-
-    await interaction.followup.send(
-        content="Choose a game...",
-        view=GameSelectView(games)
-    )
+    else:
+        await interaction.followup.send(
+            content="Choose a game...",
+            view=GameSelectView(games)
+        )
 
 # slash command to get a random game
 @app_commands.command(name="randomgame", description="Pick a random game from your unplayed games")
