@@ -1,8 +1,8 @@
 import os
-import discord
-import requests
 import random
 import html
+import discord
+import requests
 from discord.ui import View, Select
 from discord import SelectOption
 from discord.ext import commands
@@ -58,11 +58,11 @@ async def on_ready():
 
         for cmd in commands:
             bot.tree.add_command(cmd, guild=guild)
-        
+
         # sync
         await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
 
-        print(f"ready to go")
+        print("ready to go")
     except Exception as e:
         print(f"error: {e}")
 
@@ -82,7 +82,7 @@ class GameSelect(Select):
     async def callback(self, interaction: discord.Interaction):
         selected_game = self.games[self.values[0]]
         appid = selected_game["id"]
-        detail_resp = requests.get(f"https://store.steampowered.com/api/appdetails?appids={appid}").json()
+        detail_resp = requests.get(f"https://store.steampowered.com/api/appdetails?appids={appid}", timeout=10).json()
         detail_data = detail_resp[str(appid)]["data"]
 
         description = html.unescape(detail_data.get("short_description", "No description available."))
@@ -110,10 +110,10 @@ class GameSelect(Select):
         )
         embed.add_field(name="Price", value=price, inline=True)
         embed.add_field(name="Release Date", value=release_date, inline=True)
-        
+
         if header_image:
             embed.set_image(url=header_image)
-        
+
         embed.set_footer(text="Powered by Steam")
 
         await interaction.response.edit_message(content=None, embed=embed, view=None)
@@ -126,7 +126,7 @@ async def steamgame(interaction: discord.Interaction, game_name: str):
 
     # search Steam store
     search_url = f"https://store.steampowered.com/api/storesearch/?term={game_name}&cc=us&l=en"
-    search_resp = requests.get(search_url).json()
+    search_resp = requests.get(search_url, timeout=5).json()
     games = search_resp.get("items", [])
 
     if not games:
@@ -148,7 +148,7 @@ async def randomgame(interaction: discord.Interaction):
     try:
         # search game by name
         search_url = f"https://store.steampowered.com/api/storesearch/?term={game_name}&cc=us&l=en"
-        search_resp = requests.get(search_url).json()
+        search_resp = requests.get(search_url, timeout=10).json()
         if not search_resp.get("items"):
             raise Exception(f"Game not found: {game_name}")
 
@@ -157,13 +157,14 @@ async def randomgame(interaction: discord.Interaction):
 
         # details
         detail_url = f"https://store.steampowered.com/api/appdetails?appids={appid}&cc=us&l=en"
-        detail_resp = requests.get(detail_url).json()
+        detail_resp = requests.get(detail_url, timeout=10).json()
         detail_data = detail_resp[str(appid)]["data"]
+        description = html.unescape(detail_data.get("short_description", "No description available.")),
 
         embed = discord.Embed(
             title=detail_data["name"],
             url=f"https://store.steampowered.com/app/{appid}/",
-            description = html.unescape(detail_data.get("short_description", "No description available.")),
+            description=description
             color=0x470109
         )
         embed.set_thumbnail(url=detail_data.get("header_image", ""))
